@@ -5,13 +5,13 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
     eslint.configs.recommended,
-    tseslint.configs.recommended,
+    ...tseslint.configs.recommendedTypeChecked,
     {
         ignores: [
             'dist',
             'node_modules',
             'eslint.config.mjs',
-            '*spec.ts',
+            'tests',
             'jest.config.js',
             'app.spec.ts',
         ],
@@ -19,7 +19,7 @@ export default tseslint.config(
     {
         languageOptions: {
             parserOptions: {
-                project: './tsconfig.json', // 👈 Add this line
+                project: './tsconfig.json',
                 projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
