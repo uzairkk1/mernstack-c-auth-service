@@ -8,6 +8,14 @@ import { ROLES } from '../config/constants'
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
     async create({ firstName, lastName, email, password }: UserData) {
+        const userExist = await this.userRepository.findOne({
+            where: { email },
+        })
+        if (userExist != undefined) {
+            const err = createHttpError(400, 'Email already exists')
+            throw err
+        }
+
         const saltRounds = 10
         const hashedPassword = await bcrypt.hash(password, saltRounds)
         try {
