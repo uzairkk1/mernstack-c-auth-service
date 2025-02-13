@@ -5,6 +5,7 @@ import { AppDataSource } from '../../src/config/data-source'
 import { truncateTable } from '../utils'
 import { User } from '../../src/entity/User'
 import exp from 'node:constants'
+import { ROLES } from '../../src/config/constants'
 
 describe('POST /auth/register ', () => {
     let connection: DataSource
@@ -14,7 +15,8 @@ describe('POST /auth/register ', () => {
     })
 
     beforeEach(async () => {
-        await truncateTable(connection)
+        await connection.dropDatabase()
+        await connection.synchronize()
     })
 
     afterAll(async () => {
@@ -81,7 +83,7 @@ describe('POST /auth/register ', () => {
             expect(users[0].lastName).toBe(userData.lastName)
         })
 
-        it('should have returned id after success', async () => {
+        it('should returned id after success', async () => {
             //AAA
             //1)Arrange
             const userData = {
@@ -97,6 +99,27 @@ describe('POST /auth/register ', () => {
             const parsed = JSON.parse(response.text)
             //3)Assert
             expect(parsed).toHaveProperty('id')
+        })
+
+        it('should assign a customer role', async () => {
+            //AAA
+            //1)Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john@doe.com',
+                password: '123456',
+            }
+            //2)Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData)
+
+            //3)Assert
+            const userRepository = connection.getRepository(User)
+            const users = await userRepository.find()
+            expect(users[0]).toHaveProperty('role')
+            expect(users[0].role).toBe(ROLES.CUSTOMER)
         })
     })
     describe('Fields are missing', () => {})
