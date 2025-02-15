@@ -3,7 +3,7 @@ import { User } from '../entity/User'
 import bcrypt from 'bcrypt'
 import { UserData } from '../types'
 import createHttpError from 'http-errors'
-import { ROLES } from '../config/constants'
+import { ROLES } from '../constants'
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}

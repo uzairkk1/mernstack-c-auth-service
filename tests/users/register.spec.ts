@@ -5,7 +5,7 @@ import { AppDataSource } from '../../src/config/data-source'
 import { truncateTable } from '../utils'
 import { User } from '../../src/entity/User'
 import exp from 'node:constants'
-import { ROLES } from '../../src/config/constants'
+import { ROLES } from '../../src/constants'
 
 describe('POST /auth/register ', () => {
     let connection: DataSource
@@ -167,5 +167,27 @@ describe('POST /auth/register ', () => {
             expect(users).toHaveLength(1)
         })
     })
-    describe('Fields are missing', () => {})
+    describe('Fields are missing', () => {
+        it('should return 400 status code if email field is missing', async () => {
+            //AAA
+            //1)Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: '',
+                password: '123456',
+            }
+            //2)Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData)
+
+            //3)Assert
+            expect(response.statusCode).toBe(400)
+
+            const userRepo = connection.getRepository(User)
+            const users = await userRepo.find()
+            expect(users).toHaveLength(0)
+        })
+    })
 })
