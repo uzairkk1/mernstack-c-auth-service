@@ -2,7 +2,7 @@ import request from 'supertest'
 import app from './../../src/app'
 import { DataSource } from 'typeorm'
 import { AppDataSource } from '../../src/config/data-source'
-import { truncateTable } from '../utils'
+import { isJwt, truncateTable } from '../utils'
 import { User } from '../../src/entity/User'
 import exp from 'node:constants'
 import { ROLES } from '../../src/constants'
@@ -165,6 +165,49 @@ describe('POST /auth/register ', () => {
             //3)Assert
             expect(response.statusCode).toBe(400)
             expect(users).toHaveLength(1)
+        })
+
+        it('should return access and refresh token', async () => {
+            //AAA
+            //1)Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john@doe.com',
+                password: '12345678',
+            }
+            //2)Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData)
+
+            interface Headers {
+                ['set-cookie']: string[]
+            }
+            let accessToken: string | undefined
+            let refreshToken: string | undefined
+            //assert
+            const rawCookies = response.headers['set-cookie']
+            // Normalize cookies: Ensure it's always an array
+            const cookies: string[] = Array.isArray(rawCookies)
+                ? rawCookies
+                : rawCookies
+                  ? [rawCookies]
+                  : []
+            cookies.forEach((cookie) => {
+                if (cookie.startsWith('accessToken=')) {
+                    accessToken = cookie.split(';')[0].split('=')[1]
+                }
+                if (cookie.startsWith('refreshToken=')) {
+                    refreshToken = cookie.split(';')[0].split('=')[1]
+                }
+            })
+
+            expect(accessToken).toBeDefined()
+            expect(refreshToken).toBeDefined()
+
+            expect(isJwt(accessToken)).toBeTruthy()
+            expect(isJwt(refreshToken)).toBeTruthy()
         })
     })
     describe('Fields are missing', () => {
@@ -331,7 +374,6 @@ describe('POST /auth/register ', () => {
             const response = await request(app)
                 .post('/auth/register')
                 .send(userData)
-            console.log(response.body)
             //3)Assert
             expect(response.body).toHaveProperty('errors')
             expect(response.body.errors.length).toBeGreaterThan(1)
