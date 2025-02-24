@@ -6,6 +6,7 @@ import { isJwt, truncateTable } from '../utils'
 import { User } from '../../src/entity/User'
 import exp from 'node:constants'
 import { ROLES } from '../../src/constants'
+import { RefreshToken } from '../../src/entity/RefreshToken'
 
 describe('POST /auth/register ', () => {
     let connection: DataSource
@@ -208,6 +209,32 @@ describe('POST /auth/register ', () => {
 
             expect(isJwt(accessToken)).toBeTruthy()
             expect(isJwt(refreshToken)).toBeTruthy()
+        })
+
+        it('should store the refresh token in db', async () => {
+            //AAA
+            //1)Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john@doe.com',
+                password: '12345678',
+            }
+            //2)Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData)
+
+            //3)Assert
+            const refreshTokenRepo = connection.getRepository(RefreshToken)
+            // const refreshTokens = await refreshTokenRepo.find()
+            const tokens = await refreshTokenRepo
+                .createQueryBuilder('refreshToken')
+                .where('refreshToken.id = :userId', {
+                    userId: response.body.id,
+                })
+                .getMany()
+            expect(tokens).toHaveLength(1)
         })
     })
     describe('Fields are missing', () => {

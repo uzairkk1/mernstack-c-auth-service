@@ -1,18 +1,16 @@
-import fs from 'fs'
-import path from 'path'
 import { NextFunction, Response } from 'express'
 import { RegisterUserRequest } from '../types'
 import { UserService } from '../services/UserService'
 import { Logger } from 'winston'
 import { validationResult } from 'express-validator'
-import { JwtPayload, sign } from 'jsonwebtoken'
-import createHttpError from 'http-errors'
-import { Config } from '../config/index'
+import { JwtPayload } from 'jsonwebtoken'
+import { TokenService } from '../services/TokenService'
 
 export class AuthController {
     constructor(
         private userService: UserService,
         private logger: Logger,
+        private tokenService: TokenService,
     ) {}
 
     async register(
@@ -48,37 +46,19 @@ export class AuthController {
 
             this.logger.info('New user has been registered', { id: user.id })
 
-            let privateKey: Buffer
-            try {
-                privateKey = fs.readFileSync(
-                    path.join(__dirname, '../../certs/private.pem'),
-                )
-            } catch (error) {
-                const err = createHttpError(
-                    500,
-                    'Error while reading private key',
-                )
-                next(err)
-                return
-            }
             const payload: JwtPayload = {
                 sub: String(user.id),
                 role: user.role,
             }
-            const accessToken = sign(payload, privateKey, {
-                algorithm: 'RS256',
-                expiresIn: '1h',
-                issuer: 'mernspace-auth-service',
+
+            const accessToken = this.tokenService.generateAccessToken(payload)
+            const newRefreshToken =
+                await this.tokenService.persistRefreshToken(user)
+
+            const refreshToken = this.tokenService.generateRefreshToken({
+                ...payload,
+                id: newRefreshToken.id,
             })
-            const refreshToken = sign(
-                payload,
-                Config.REFRESH_TOKEN_SECRET as string,
-                {
-                    algorithm: 'HS256',
-                    expiresIn: '1y',
-                    issuer: 'mernspace-auth-service',
-                },
-            )
 
             res.cookie('accessToken', accessToken, {
                 domain: 'localhost',
