@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { RegisterUserRequest } from '../types'
 import { UserService } from '../services/UserService'
 import { Logger } from 'winston'
@@ -157,10 +157,14 @@ export class AuthController {
 
             this.logger.info('user has been logged in', { id: user.id })
             // Return the response (id)
-            res.status(201).json({ id: user.id })
+            res.status(200).json({ id: user.id })
         } catch (error) {
             next(error)
             return
         }
+    }
+
+    self(req: Request, res: Response) {
+        res.status(200).json({})
     }
 }
