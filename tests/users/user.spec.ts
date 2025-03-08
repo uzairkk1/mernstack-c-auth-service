@@ -102,5 +102,13 @@ describe('GET /auth/self', () => {
             //CHECK IF USERID MATCHES WITH REGISTERED USER
             expect(response.body).not.toHaveProperty('password')
         })
+
+        it('should return 401 is token not exist', async () => {
+            //ADD TOKEN TO COOKIE
+            const response = await request(app).get('/auth/self').send()
+            //ASSERT
+            //CHECK IF USERID MATCHES WITH REGISTERED USER
+            expect(response.statusCode).toBe(401)
+        })
     })
 })
