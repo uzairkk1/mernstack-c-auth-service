@@ -164,8 +164,60 @@ export class AuthController {
         }
     }
 
-    async self(req: AuthRequest, res: Response) {
-        const user = await this.userService.findById(Number(req.auth.sub))
-        res.status(200).json({ ...user, password: undefined })
+    async self(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const user = await this.userService.findById(Number(req.auth.sub))
+            res.status(200).json({ ...user, password: undefined })
+            return
+        } catch (error) {
+            next(error)
+            return
+        }
+    }
+    async refresh(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const payload = {
+                sub: req.auth.sub,
+                role: req.auth.role,
+            }
+            // generate tokens
+            const accessToken = this.tokenService.generateAccessToken(payload)
+
+            const user = await this.userService.findById(Number(req.auth.sub))
+            if (!user) {
+                next(createHttpError(400, 'User with the token could not find'))
+                return
+            }
+
+            const newRefreshToken =
+                await this.tokenService.persistRefreshToken(user)
+            //Delete old refresh token
+            await this.tokenService.deleteRefreshToken(Number(req.auth.id))
+            const refreshToken = this.tokenService.generateRefreshToken({
+                ...payload,
+                id: newRefreshToken.id,
+            })
+            // add tokens to Cookie
+            res.cookie('accessToken', accessToken, {
+                domain: 'localhost',
+                sameSite: 'strict',
+                maxAge: 1000 * 60 * 60,
+                httpOnly: true,
+            })
+
+            res.cookie('refreshToken', refreshToken, {
+                domain: 'localhost',
+                sameSite: 'strict',
+                maxAge: 1000 * 60 * 60 * 24 * 365,
+                httpOnly: true,
+            })
+
+            this.logger.info('user has been logged in', { id: user.id })
+            // Return the response (id)
+            res.status(200).json({ id: user.id })
+        } catch (error) {
+            next(error)
+            return
+        }
     }
 }
