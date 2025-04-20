@@ -35,7 +35,7 @@ export class TokenService {
                 algorithm: 'HS256',
                 expiresIn: '1y',
                 issuer: 'mernspace-auth-service',
-                jwtid: String(payload.id),
+                jwtid: String(payload.id), //TODO need to know why we have done this
             },
         )
 
