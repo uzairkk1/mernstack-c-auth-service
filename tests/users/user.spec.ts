@@ -8,27 +8,27 @@ import { User } from '../../src/entity/User'
 import { ROLES } from '../../src/constants'
 import createJWKSMock, { JWKSMock } from 'mock-jwks'
 
-describe.skip('GET /auth/self', () => {
+describe('GET /auth/self', () => {
     let connection: DataSource
     let jwks: ReturnType<typeof createJWKSMock>
 
     beforeAll(async () => {
-        jwks = createJWKSMock('https://localhost:5503/')
         connection = await AppDataSource.initialize()
+        jwks = createJWKSMock('http://localhost:5509')
     })
 
     beforeEach(async () => {
-        jwks.start()
         await connection.dropDatabase()
         await connection.synchronize()
+        jwks.start()
     })
 
-    afterEach(async () => {
-        jwks.stop()
-    })
-
+    
     afterAll(async () => {
         await connection.destroy()
+    })
+    afterEach(async () => {
+        jwks.stop()
     })
 
     describe('Given all fields', () => {
@@ -43,7 +43,7 @@ describe.skip('GET /auth/self', () => {
                 .get('/auth/self')
                 .set('Cookie', `accessToken=${accessToken};`)
                 .send()
-
+                console.log(response.body)
             expect(response.statusCode).toBe(200)
         })
 
