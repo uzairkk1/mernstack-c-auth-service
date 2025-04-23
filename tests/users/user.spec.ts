@@ -43,7 +43,6 @@ describe('GET /auth/self', () => {
                 .get('/auth/self')
                 .set('Cookie', `accessToken=${accessToken};`)
                 .send()
-                console.log(response.body)
             expect(response.statusCode).toBe(200)
         })
 
