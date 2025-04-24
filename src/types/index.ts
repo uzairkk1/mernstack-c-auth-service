@@ -8,6 +8,11 @@ export interface UserData {
     role: string
 }
 
+export interface UpdateUserData {
+    firstName: string
+    lastName: string
+}
+
 export interface RegisterUserRequest extends Request {
     body: UserData
 }
