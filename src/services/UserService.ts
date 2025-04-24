@@ -7,7 +7,7 @@ import { ROLES } from '../constants'
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
-    async create({ firstName, lastName, email, password }: UserData) {
+    async create({ firstName, lastName, email, password, role }: UserData) {
         const userExist = await this.userRepository.findOne({
             where: { email },
         })
@@ -24,7 +24,7 @@ export class UserService {
                 lastName,
                 email,
                 password: hashedPassword,
-                role: ROLES.CUSTOMER,
+                role,
             })
         } catch (error) {
             const err = createHttpError(
