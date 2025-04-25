@@ -6,7 +6,7 @@ import createHttpError from 'http-errors'
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
-    async create({ firstName, lastName, email, password, role }: UserData) {
+    async create({ firstName, lastName, email, password, role, tenantId }: UserData) {
         const userExist = await this.userRepository.findOne({
             where: { email },
         })
@@ -24,6 +24,7 @@ export class UserService {
                 email,
                 password: hashedPassword,
                 role,
+                tenant: tenantId ? { id: tenantId } : undefined,
             })
         } catch (error) {
             const err = createHttpError(
@@ -34,8 +35,8 @@ export class UserService {
         }
     }
 
-    async findByEmail(email: string) {
-        const user = await this.userRepository.findOne({ where: { email } })
+    async findByEmailWithPassword(email: string) {
+        const user = await this.userRepository.findOne({ where: { email }, select: ['id', 'firstName', 'lastName', 'email', 'role', 'password'] })
         return user
     }
     async findById(id: number) {

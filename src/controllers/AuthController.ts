@@ -33,7 +33,7 @@ export class AuthController {
             return
         }
 
-        const { firstName, lastName, email, password } = req.body
+        const { firstName, lastName, email, password, tenantId } = req.body
         this.logger.debug('New request to register a user', {
             firstName,
             lastName,
@@ -46,7 +46,8 @@ export class AuthController {
                 lastName,
                 email,
                 password,
-                role: ROLES.CUSTOMER
+                role: ROLES.CUSTOMER,
+                tenantId,
             })
 
             this.logger.info('New user has been registered', { id: user.id })
@@ -106,7 +107,7 @@ export class AuthController {
 
         try {
             // check if username/email exists in database
-            const user = await this.userService.findByEmail(email)
+            const user = await this.userService.findByEmailWithPassword(email)
             if (!user) {
                 const error = createHttpError(
                     400,

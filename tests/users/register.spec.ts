@@ -138,7 +138,7 @@ describe('POST /auth/register ', () => {
                 .send(userData)
             //3)Assert
             const userRepository = connection.getRepository(User)
-            const users = await userRepository.find()
+            const users = await userRepository.find({select: ['password']})
             expect(users[0].password).not.toBe(userData.password)
             expect(users[0].password).toHaveLength(60)
             expect(users[0].password).toMatch(/^\$2b\$\d+\$/)

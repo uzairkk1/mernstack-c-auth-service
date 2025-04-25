@@ -18,11 +18,11 @@ export class UserController {
                 return
             }
 
-            const {firstName, lastName , email, password } = req.body;
+            const {firstName, lastName , email, password, tenantId } = req.body;
             
             this.logger.info('Creating a new Manager', {email})
 
-            const user = await this.userService.create({firstName, lastName , email, password, role: ROLES.MANAGER })
+            const user = await this.userService.create({firstName, lastName , email, password, role: ROLES.MANAGER, tenantId })
             this.logger.info('Manager created successfully', {id: user.id})
 
             res.status(201).json({id: user.id})

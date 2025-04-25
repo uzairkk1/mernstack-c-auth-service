@@ -43,7 +43,7 @@ describe("POST /users", () => {
                 lastName: "kk",
                 email: "uzair@mern.space",
                 password: "123123123",
-                tenantId: 1,
+                // tenantId: 1,
             };
 
             // Add token to cookie
@@ -71,7 +71,7 @@ describe("POST /users", () => {
                 lastName: "kk",
                 email: "uzair@mern.space",
                 password: "123123123",
-                tenantId: 1,
+                // tenantId: 1,
             };
 
             // Add token to cookie
