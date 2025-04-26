@@ -32,13 +32,13 @@ router.post(
     '/register',
     registerValidator,
     (req: Request, res: Response, next: NextFunction) =>
-        authController.register(req, res, next),
+        void authController.register(req, res, next),
 )
 router.post(
     '/login',
     loginValidator,
     (req: Request, res: Response, next: NextFunction) =>
-        authController.login(req, res, next),
+        void authController.login(req, res, next),
 )
 
 router.get(

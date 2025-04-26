@@ -20,23 +20,23 @@ const userController = new UserController(userService, logger);
 
 router.route('/')
 .get(authenticate, canAccess([ROLES.ADMIN]), (req: Request, res: Response, next: NextFunction) => {
-    return userController.getAll(req, res, next)
+    void userController.getAll(req, res, next)
 })
 .post(
     authenticate,
     canAccess([ROLES.ADMIN]),
     createUserValidator,
     (req: Request, res: Response, next: NextFunction) => {
-        return userController.create(req, res, next)
+        void userController.create(req, res, next)
     }
 )
 
 router.route("/:id").get(authenticate, canAccess([ROLES.ADMIN]), (req, res, next) => {
-    return userController.getOne(req, res, next)
+    void userController.getOne(req, res, next)
 }).patch(authenticate, canAccess([ROLES.ADMIN]), updateUserValidator, (req: Request, res: Response, next: NextFunction) => {
-    return userController.update(req, res, next)
+    void userController.update(req, res, next)
 }).delete(authenticate, canAccess([ROLES.ADMIN]), (req, res, next) => {
-    return userController.delete(req, res, next)
+    void userController.delete(req, res, next)
 })
 
 

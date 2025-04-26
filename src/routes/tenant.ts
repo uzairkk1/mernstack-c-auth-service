@@ -17,22 +17,22 @@ const tenantService = new TenantService(tenantRepository)
 const tenantController = new TenantController(tenantService, logger);
 
 router.route('/').get(authenticate, canAccess([ROLES.ADMIN]), (req: Request, res: Response, next: NextFunction) => {
-    return tenantController.getAll(req, res, next)
+    void tenantController.getAll(req, res, next)
 }).post(
     authenticate,
     canAccess([ROLES.ADMIN]),
     tennatValidator,
     (req: Request, res: Response, next: NextFunction) => {
-        return tenantController.create(req, res, next)
+        void tenantController.create(req, res, next)
     }
 )
 
 router.route("/:id").get(authenticate, canAccess([ROLES.ADMIN]), (req, res, next) => {
-    return tenantController.getOne(req, res, next)
+    void tenantController.getOne(req, res, next)
 }).patch(authenticate, canAccess([ROLES.ADMIN]), tennatValidator, (req: Request, res: Response, next: NextFunction) => {
-    return tenantController.update(req, res, next)
+    void tenantController.update(req, res, next)
 }).delete(authenticate, canAccess([ROLES.ADMIN]), (req, res, next) => {
-    return tenantController.delete(req, res, next)
+    void tenantController.delete(req, res, next)
 })
 
 
