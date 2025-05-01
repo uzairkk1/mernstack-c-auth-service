@@ -1,5 +1,4 @@
 import { DataSource } from 'typeorm'
-import bcrypt from 'bcrypt'
 import request from 'supertest'
 import { AppDataSource } from '../../src/config/data-source'
 import app from '../../src/app'
@@ -23,7 +22,6 @@ describe('GET /auth/self', () => {
         jwks.start()
     })
 
-    
     afterAll(async () => {
         await connection.destroy()
     })
