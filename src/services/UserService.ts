@@ -1,12 +1,19 @@
 import { Repository } from 'typeorm'
 import { User } from '../entity/User'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { UpdateUserData, UserData } from '../types'
 import createHttpError from 'http-errors'
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
-    async create({ firstName, lastName, email, password, role, tenantId }: UserData) {
+    async create({
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+        tenantId,
+    }: UserData) {
         const userExist = await this.userRepository.findOne({
             where: { email },
         })
@@ -36,7 +43,17 @@ export class UserService {
     }
 
     async findByEmailWithPassword(email: string) {
-        const user = await this.userRepository.findOne({ where: { email }, select: ['id', 'firstName', 'lastName', 'email', 'role', 'password'] })
+        const user = await this.userRepository.findOne({
+            where: { email },
+            select: [
+                'id',
+                'firstName',
+                'lastName',
+                'email',
+                'role',
+                'password',
+            ],
+        })
         return user
     }
     async findById(id: number) {
@@ -44,17 +61,17 @@ export class UserService {
         return user
     }
     async getAll() {
-        return await this.userRepository.find();
+        return await this.userRepository.find()
     }
     async getById(userId: number) {
         return await this.userRepository.findOne({
-            where: {id: userId}
+            where: { id: userId },
         })
     }
     async deleteById(userId: number) {
         return await this.userRepository.delete(userId)
     }
     async update(id: number, tenantData: UpdateUserData) {
-            return await this.userRepository.update(id, tenantData)
-        }
+        return await this.userRepository.update(id, tenantData)
+    }
 }
