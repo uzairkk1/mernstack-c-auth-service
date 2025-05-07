@@ -68,14 +68,16 @@ export class AuthController {
 
             res.cookie('accessToken', accessToken, {
                 domain: 'localhost',
-                sameSite: 'strict',
+                sameSite: 'none',
+                secure: true,
                 maxAge: 1000 * 60 * 60,
                 httpOnly: true,
             })
 
             res.cookie('refreshToken', refreshToken, {
                 domain: 'localhost',
-                sameSite: 'strict',
+                sameSite: 'none',
+                secure: true,
                 maxAge: 1000 * 60 * 60 * 24 * 365,
                 httpOnly: true,
             })
@@ -146,14 +148,16 @@ export class AuthController {
             // add tokens to Cookie
             res.cookie('accessToken', accessToken, {
                 domain: 'localhost',
-                sameSite: 'strict',
+                sameSite: 'none',
+                secure: true,
                 maxAge: 1000 * 60 * 60,
                 httpOnly: true,
             })
 
             res.cookie('refreshToken', refreshToken, {
                 domain: 'localhost',
-                sameSite: 'strict',
+                sameSite: 'none',
+                secure: true,
                 maxAge: 1000 * 60 * 60 * 24 * 365,
                 httpOnly: true,
             })
@@ -203,14 +207,16 @@ export class AuthController {
             // add tokens to Cookie
             res.cookie('accessToken', accessToken, {
                 domain: 'localhost',
-                sameSite: 'strict',
+                sameSite: 'none',
+                secure: true,
                 maxAge: 1000 * 60 * 60,
                 httpOnly: true,
             })
 
             res.cookie('refreshToken', refreshToken, {
                 domain: 'localhost',
-                sameSite: 'strict',
+                sameSite: 'none',
+                secure: true,
                 maxAge: 1000 * 60 * 60 * 24 * 365,
                 httpOnly: true,
             })
@@ -226,12 +232,16 @@ export class AuthController {
 
     async logout(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            await this.tokenService.deleteRefreshToken(Number(req.auth.id));
-            this.logger.info('Refresh token has been deleted', {id: req.auth.id})
-            this.logger.info('User has been logged out successfully', {id: req.auth.sub})
+            await this.tokenService.deleteRefreshToken(Number(req.auth.id))
+            this.logger.info('Refresh token has been deleted', {
+                id: req.auth.id,
+            })
+            this.logger.info('User has been logged out successfully', {
+                id: req.auth.sub,
+            })
 
-            res.clearCookie('accessToken');
-            res.clearCookie('refresToken');
+            res.clearCookie('accessToken')
+            res.clearCookie('refresToken')
 
             res.status(200).json({})
         } catch (error) {
